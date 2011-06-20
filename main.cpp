@@ -29,6 +29,29 @@
 #endif
 
 
+class Controller : public irr::IEventReceiver
+{
+  public:
+    Controller(irr::IrrlichtDevice* device) : m_device(device), m_step(0)
+    {
+        m_device->setEventReceiver(this);
+    }
+
+    virtual bool OnEvent(const irr::SEvent& event)
+    {
+        if(event.EventType == irr::EET_KEY_INPUT_EVENT && event.KeyInput.Key == irr::KEY_ESCAPE)
+        {
+            m_device->closeDevice();
+            return true;
+        }
+        return false;
+    }
+
+  protected:
+    irr::u32 m_step;
+    irr::IrrlichtDevice* m_device;
+};
+
 
 int main()
 {
@@ -49,6 +72,8 @@ int main()
     device->getCursorControl()->setVisible(false);
 
 	if (!device) return 1;
+
+    Controller controller(device);
 
     irr::video::IVideoDriver* driver = device->getVideoDriver();
     irr::scene::ISceneManager* smgr = device->getSceneManager();

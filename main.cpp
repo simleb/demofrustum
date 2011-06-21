@@ -35,7 +35,7 @@ enum CameraId { INSIDE_CAM, OUTSIDE_CAM, SIDE_CAM, TOP_CAM, CAM_COUNT };
 class Controller : public irr::IEventReceiver
 {
   public:
-    Controller() : m_device(0)
+    Controller() : m_device(0), m_bounds(true), m_axe(true)
     {
         m_device = irr::createDevice(irr::video::EDT_NULL);
         const irr::s32 n = m_device->getVideoModeList()->getVideoModeCount();
@@ -114,48 +114,18 @@ class Controller : public irr::IEventReceiver
                 m_frustum_node->setVisible(true);
             }
 
+            irr::video::SMaterial mat;
+            mat.setFlag(irr::video::EMF_LIGHTING, false);
+            m_driver->setMaterial(mat);
+            m_driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
+
             m_driver->beginScene(true, true, 0);
 
-            if (m_frustum_node->isVisible())
-            {
-                const irr::scene::SViewFrustum* frustum = m_inside_cam->getViewFrustum();
-                irr::video::SMaterial mat;
-                mat.setFlag(irr::video::EMF_LIGHTING, false);
-                m_driver->setMaterial(mat);
-                m_driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
+            if (m_bounds)
+                drawBounds();
 
-                m_driver->draw3DLine(irr::core::vector3df(0,0,0), frustum->getFarLeftDown());
-                m_driver->draw3DLine(irr::core::vector3df(0,0,0), frustum->getFarLeftUp());
-                m_driver->draw3DLine(irr::core::vector3df(0,0,0), frustum->getFarRightUp());
-                m_driver->draw3DLine(irr::core::vector3df(0,0,0), frustum->getFarRightDown());
-
-                m_driver->draw3DLine(frustum->getFarLeftDown(), frustum->getFarLeftUp());
-                m_driver->draw3DLine(frustum->getFarLeftUp(), frustum->getFarRightUp());
-                m_driver->draw3DLine(frustum->getFarRightUp(), frustum->getFarRightDown());
-                m_driver->draw3DLine(frustum->getFarRightDown(), frustum->getFarLeftDown());
-
-                irr::core::vector3df nlu;
-                frustum->planes[irr::scene::SViewFrustum::VF_NEAR_PLANE].getIntersectionWithPlanes(
-                    frustum->planes[irr::scene::SViewFrustum::VF_TOP_PLANE],
-                    frustum->planes[irr::scene::SViewFrustum::VF_LEFT_PLANE], nlu);
-                irr::core::vector3df nru;
-                frustum->planes[irr::scene::SViewFrustum::VF_NEAR_PLANE].getIntersectionWithPlanes(
-                    frustum->planes[irr::scene::SViewFrustum::VF_TOP_PLANE],
-                    frustum->planes[irr::scene::SViewFrustum::VF_RIGHT_PLANE], nru);
-                irr::core::vector3df nld;
-                frustum->planes[irr::scene::SViewFrustum::VF_NEAR_PLANE].getIntersectionWithPlanes(
-                    frustum->planes[irr::scene::SViewFrustum::VF_BOTTOM_PLANE],
-                    frustum->planes[irr::scene::SViewFrustum::VF_LEFT_PLANE], nld);
-                irr::core::vector3df nrd;
-                frustum->planes[irr::scene::SViewFrustum::VF_NEAR_PLANE].getIntersectionWithPlanes(
-                    frustum->planes[irr::scene::SViewFrustum::VF_BOTTOM_PLANE],
-                    frustum->planes[irr::scene::SViewFrustum::VF_RIGHT_PLANE], nrd);
-
-                m_driver->draw3DLine(nld, nlu);
-                m_driver->draw3DLine(nlu, nru);
-                m_driver->draw3DLine(nru, nrd);
-                m_driver->draw3DLine(nrd, nld);
-            }
+            if (m_axe)
+                drawAxe();
 
             m_smgr->drawAll();
 
@@ -167,6 +137,50 @@ class Controller : public irr::IEventReceiver
         m_device->drop();
 
         return 0;
+    }
+
+
+    void drawAxe()
+    {
+        m_driver->draw3DLine(irr::core::vector3df(0,0,0), irr::core::vector3df(0,0,10));
+    }
+
+
+    void drawBounds()
+    {
+        const irr::scene::SViewFrustum* frustum = m_inside_cam->getViewFrustum();
+
+        m_driver->draw3DLine(irr::core::vector3df(0,0,0), frustum->getFarLeftDown());
+        m_driver->draw3DLine(irr::core::vector3df(0,0,0), frustum->getFarLeftUp());
+        m_driver->draw3DLine(irr::core::vector3df(0,0,0), frustum->getFarRightUp());
+        m_driver->draw3DLine(irr::core::vector3df(0,0,0), frustum->getFarRightDown());
+
+        m_driver->draw3DLine(frustum->getFarLeftDown(), frustum->getFarLeftUp());
+        m_driver->draw3DLine(frustum->getFarLeftUp(), frustum->getFarRightUp());
+        m_driver->draw3DLine(frustum->getFarRightUp(), frustum->getFarRightDown());
+        m_driver->draw3DLine(frustum->getFarRightDown(), frustum->getFarLeftDown());
+
+        irr::core::vector3df nlu;
+        frustum->planes[irr::scene::SViewFrustum::VF_NEAR_PLANE].getIntersectionWithPlanes(
+                                                                                           frustum->planes[irr::scene::SViewFrustum::VF_TOP_PLANE],
+                                                                                           frustum->planes[irr::scene::SViewFrustum::VF_LEFT_PLANE], nlu);
+        irr::core::vector3df nru;
+        frustum->planes[irr::scene::SViewFrustum::VF_NEAR_PLANE].getIntersectionWithPlanes(
+                                                                                           frustum->planes[irr::scene::SViewFrustum::VF_TOP_PLANE],
+                                                                                           frustum->planes[irr::scene::SViewFrustum::VF_RIGHT_PLANE], nru);
+        irr::core::vector3df nld;
+        frustum->planes[irr::scene::SViewFrustum::VF_NEAR_PLANE].getIntersectionWithPlanes(
+                                                                                           frustum->planes[irr::scene::SViewFrustum::VF_BOTTOM_PLANE],
+                                                                                           frustum->planes[irr::scene::SViewFrustum::VF_LEFT_PLANE], nld);
+        irr::core::vector3df nrd;
+        frustum->planes[irr::scene::SViewFrustum::VF_NEAR_PLANE].getIntersectionWithPlanes(
+                                                                                           frustum->planes[irr::scene::SViewFrustum::VF_BOTTOM_PLANE],
+                                                                                           frustum->planes[irr::scene::SViewFrustum::VF_RIGHT_PLANE], nrd);
+
+        m_driver->draw3DLine(nld, nlu);
+        m_driver->draw3DLine(nlu, nru);
+        m_driver->draw3DLine(nru, nrd);
+        m_driver->draw3DLine(nrd, nld);
     }
 
 
@@ -214,6 +228,16 @@ class Controller : public irr::IEventReceiver
                 m_far->setVisible(!m_far->isVisible());
                 return true;
             }
+            if (event.KeyInput.Key == irr::KEY_KEY_B) // Toggle bounds
+            {
+                m_bounds = !m_bounds;
+                return true;
+            }
+            if (event.KeyInput.Key == irr::KEY_KEY_A) // Toggle axe
+            {
+                m_axe = !m_axe;
+                return true;
+            }
             if (event.KeyInput.Key == irr::KEY_ESCAPE) // Quit
             {
                 m_device->closeDevice();
@@ -232,6 +256,8 @@ class Controller : public irr::IEventReceiver
     irr::scene::ICameraSceneNode* m_cam;
     irr::core::vector3df m_position[CAM_COUNT];
     irr::scene::ISceneNode* m_frustum_node;
+    bool m_axe;
+    bool m_bounds;
     irr::scene::IMeshSceneNode* m_near;
     irr::scene::IMeshSceneNode* m_far;
 };

@@ -68,6 +68,28 @@ class Controller : public irr::IEventReceiver
         cube->setMaterialTexture(0, m_driver->getTexture("media/cube.jpg"));
         cube->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 
+        irr::scene::IMesh* mesh = m_smgr->getGeometryCreator()->createPlaneMesh(irr::core::dimension2df(1.3255,0.8285),
+                                                                                irr::core::dimension2du(1,1),
+                                                                                0,
+                                                                                irr::core::dimension2df(1,1));
+        m_smgr->getMeshManipulator()->setVertexColorAlpha(mesh, 30);
+        m_near = m_smgr->addMeshSceneNode(mesh, m_frustum, -1, irr::core::vector3df(0,0,1), irr::core::vector3df(-90,0,0));
+        m_near->setMaterialType(irr::video::EMT_TRANSPARENT_VERTEX_ALPHA);
+        m_near->getMaterial(0).EmissiveColor.set(255, 0, 0, 255);
+        m_near->getMaterial(0).BackfaceCulling = false;
+        m_near->setVisible(false);
+
+        irr::scene::IMesh* mesh2 = m_smgr->getGeometryCreator()->createPlaneMesh(irr::core::dimension2df(13.255,8.285),
+                                                                                 irr::core::dimension2du(1,1),
+                                                                                 0,
+                                                                                 irr::core::dimension2df(1,1));
+        m_smgr->getMeshManipulator()->setVertexColorAlpha(mesh2, 30);
+        m_far = m_smgr->addMeshSceneNode(mesh2, m_frustum, -1, irr::core::vector3df(0,0,10), irr::core::vector3df(-90,0,0));
+        m_far->setMaterialType(irr::video::EMT_TRANSPARENT_VERTEX_ALPHA);
+        m_far->getMaterial(0).EmissiveColor.set(255, 255, 0, 0);
+        m_far->getMaterial(0).BackfaceCulling = false;
+        m_far->setVisible(false);
+
         m_cam[OUTSIDE_CAM] = m_smgr->addCameraSceneNode(0, irr::core::vector3df(-8,3,-4), irr::core::vector3df(0,0,5));
 
         m_cam[TOP_CAM] = m_smgr->addCameraSceneNode(0, irr::core::vector3df(0,10,5), irr::core::vector3df(0,0,5));
@@ -173,6 +195,16 @@ class Controller : public irr::IEventReceiver
                 m_smgr->setActiveCamera(m_cam[MAYA_CAM]);
                 return true;
             }
+            if (event.KeyInput.Key == irr::KEY_KEY_N) // Toggle near plan coloring
+            {
+                m_near->setVisible(!m_near->isVisible());
+                return true;
+            }
+            if (event.KeyInput.Key == irr::KEY_KEY_F) // Toggle far plan coloring
+            {
+                m_far->setVisible(!m_far->isVisible());
+                return true;
+            }
             if (event.KeyInput.Key == irr::KEY_ESCAPE) // Quit
             {
                 m_device->closeDevice();
@@ -189,6 +221,8 @@ class Controller : public irr::IEventReceiver
     CameraId m_camid;
     irr::scene::ICameraSceneNode* m_cam[CAM_COUNT];
     irr::scene::ISceneNode* m_frustum;
+    irr::scene::IMeshSceneNode* m_near;
+    irr::scene::IMeshSceneNode* m_far;
 };
 
 

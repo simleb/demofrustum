@@ -29,7 +29,7 @@
 #endif
 
 
-enum CameraId { INSIDE_CAM, OUTSIDE_CAM, TOP_CAM, SIDE_CAM, FPS_CAM, MAYA_CAM, CAM_COUNT };
+enum CameraId { INSIDE_CAM, OUTSIDE_CAM, SIDE_CAM, TOP_CAM, CAM_COUNT };
 
 
 class Controller : public irr::IEventReceiver
@@ -51,20 +51,20 @@ class Controller : public irr::IEventReceiver
         m_smgr = m_device->getSceneManager();
 
         createScene();
-
-        m_smgr->setActiveCamera(m_cam[INSIDE_CAM]);
     }
+
 
     void createScene()
     {
-        m_frustum = m_smgr->addEmptySceneNode();
-        m_cam[INSIDE_CAM] = m_smgr->addCameraSceneNode(m_frustum);
-        m_cam[INSIDE_CAM]->setNearValue(1);
-        m_cam[INSIDE_CAM]->setFarValue(10);
-        m_cam[INSIDE_CAM]->setFOV(irr::core::PI / 4.0);
-        irr::scene::ISceneNode* cube = m_smgr->addCubeSceneNode(1, m_frustum, -1,
-                                                              irr::core::vector3df(0,0,5),
-                                                              irr::core::vector3df(-36,28,0));
+        m_inside_cam = m_smgr->addCameraSceneNode(0, irr::core::vector3df(0,0,0), irr::core::vector3df(0,0,5));
+        m_inside_cam->setNearValue(1);
+        m_inside_cam->setFarValue(10);
+        m_inside_cam->setFOV(irr::core::PI / 4.0);
+
+        m_frustum_node = m_smgr->addEmptySceneNode();
+        irr::scene::ISceneNode* cube = m_smgr->addCubeSceneNode(1, 0, -1,
+                                                                irr::core::vector3df(0,0,5),
+                                                                irr::core::vector3df(-36,28,0));
         cube->setMaterialTexture(0, m_driver->getTexture("media/cube.jpg"));
         cube->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 
@@ -73,7 +73,7 @@ class Controller : public irr::IEventReceiver
                                                                                 0,
                                                                                 irr::core::dimension2df(1,1));
         m_smgr->getMeshManipulator()->setVertexColorAlpha(mesh, 30);
-        m_near = m_smgr->addMeshSceneNode(mesh, m_frustum, -1, irr::core::vector3df(0,0,1), irr::core::vector3df(-90,0,0));
+        m_near = m_smgr->addMeshSceneNode(mesh, m_frustum_node, -1, irr::core::vector3df(0,0,1), irr::core::vector3df(-90,0,0));
         m_near->setMaterialType(irr::video::EMT_TRANSPARENT_VERTEX_ALPHA);
         m_near->getMaterial(0).EmissiveColor.set(255, 0, 0, 255);
         m_near->getMaterial(0).BackfaceCulling = false;
@@ -84,33 +84,41 @@ class Controller : public irr::IEventReceiver
                                                                                  0,
                                                                                  irr::core::dimension2df(1,1));
         m_smgr->getMeshManipulator()->setVertexColorAlpha(mesh2, 30);
-        m_far = m_smgr->addMeshSceneNode(mesh2, m_frustum, -1, irr::core::vector3df(0,0,10), irr::core::vector3df(-90,0,0));
+        m_far = m_smgr->addMeshSceneNode(mesh2, m_frustum_node, -1, irr::core::vector3df(0,0,10), irr::core::vector3df(-90,0,0));
         m_far->setMaterialType(irr::video::EMT_TRANSPARENT_VERTEX_ALPHA);
         m_far->getMaterial(0).EmissiveColor.set(255, 255, 0, 0);
         m_far->getMaterial(0).BackfaceCulling = false;
         m_far->setVisible(false);
 
-        m_cam[OUTSIDE_CAM] = m_smgr->addCameraSceneNode(0, irr::core::vector3df(-8,3,-4), irr::core::vector3df(0,0,5));
+        m_position[OUTSIDE_CAM] = irr::core::vector3df(-8,3,-4);
+        m_position[TOP_CAM] = irr::core::vector3df(0,10,5);
+        m_position[SIDE_CAM] = irr::core::vector3df(-10,0,5);
 
-        m_cam[TOP_CAM] = m_smgr->addCameraSceneNode(0, irr::core::vector3df(0,10,5), irr::core::vector3df(0,0,5));
-        m_cam[TOP_CAM]->setUpVector(irr::core::vector3df(1,0,0));
-
-        m_cam[SIDE_CAM] = m_smgr->addCameraSceneNode(0, irr::core::vector3df(-10,0,5), irr::core::vector3df(0,0,5));
-
-        m_cam[FPS_CAM] = m_smgr->addCameraSceneNodeFPS(0, 100, 0.01);
-
-        m_cam[MAYA_CAM] = m_smgr->addCameraSceneNodeMaya(0);
+        m_cam = m_smgr->addCameraSceneNode();
+        m_cam->setTarget(irr::core::vector3df(0,0,5));
     }
+
 
     int run()
     {
         while (m_device->run())
         {
+            if (m_cam->getPosition() == m_inside_cam->getPosition())
+            {
+                m_smgr->setActiveCamera(m_inside_cam);
+                m_frustum_node->setVisible(false);
+            }
+            else
+            {
+                m_smgr->setActiveCamera(m_cam);
+                m_frustum_node->setVisible(true);
+            }
+
             m_driver->beginScene(true, true, 0);
 
-            if (m_smgr->getActiveCamera() != m_cam[INSIDE_CAM])
+            if (m_frustum_node->isVisible())
             {
-                const irr::scene::SViewFrustum* frustum = m_cam[INSIDE_CAM]->getViewFrustum();
+                const irr::scene::SViewFrustum* frustum = m_inside_cam->getViewFrustum();
                 irr::video::SMaterial mat;
                 mat.setFlag(irr::video::EMF_LIGHTING, false);
                 m_driver->setMaterial(mat);
@@ -161,38 +169,39 @@ class Controller : public irr::IEventReceiver
         return 0;
     }
 
+
+    void switchToCam(CameraId id)
+    {
+        m_smgr->setActiveCamera(m_cam);
+        irr::scene::ISceneNodeAnimator* anim;
+        anim = m_smgr->createFlyStraightAnimator(m_cam->getPosition(), m_position[id], 300);
+        m_cam->addAnimator(anim);
+        anim->drop();
+    }
+
+
     virtual bool OnEvent(const irr::SEvent& event)
     {
         if (event.EventType == irr::EET_KEY_INPUT_EVENT && !event.KeyInput.PressedDown)
         {
             if (event.KeyInput.Key == irr::KEY_KEY_1) // Inside cam
             {
-                m_smgr->setActiveCamera(m_cam[INSIDE_CAM]);
+                switchToCam(INSIDE_CAM);
                 return true;
             }
             if (event.KeyInput.Key == irr::KEY_KEY_2) // Outide cam
             {
-                m_smgr->setActiveCamera(m_cam[OUTSIDE_CAM]);
+                switchToCam(OUTSIDE_CAM);
                 return true;
             }
-            if (event.KeyInput.Key == irr::KEY_KEY_3) // Top cam
+            if (event.KeyInput.Key == irr::KEY_KEY_3) // Side cam
             {
-                m_smgr->setActiveCamera(m_cam[TOP_CAM]);
+                switchToCam(SIDE_CAM);
                 return true;
             }
-            if (event.KeyInput.Key == irr::KEY_KEY_4) // Side cam
+            if (event.KeyInput.Key == irr::KEY_KEY_4) // Top cam
             {
-                m_smgr->setActiveCamera(m_cam[SIDE_CAM]);
-                return true;
-            }
-            if (event.KeyInput.Key == irr::KEY_KEY_5) // FPS cam
-            {
-                m_smgr->setActiveCamera(m_cam[FPS_CAM]);
-                return true;
-            }
-            if (event.KeyInput.Key == irr::KEY_KEY_6) // Maya cam
-            {
-                m_smgr->setActiveCamera(m_cam[MAYA_CAM]);
+                switchToCam(TOP_CAM);
                 return true;
             }
             if (event.KeyInput.Key == irr::KEY_KEY_N) // Toggle near plan coloring
@@ -219,8 +228,10 @@ class Controller : public irr::IEventReceiver
     irr::video::IVideoDriver* m_driver;
     irr::scene::ISceneManager* m_smgr;
     CameraId m_camid;
-    irr::scene::ICameraSceneNode* m_cam[CAM_COUNT];
-    irr::scene::ISceneNode* m_frustum;
+    irr::scene::ICameraSceneNode* m_inside_cam;
+    irr::scene::ICameraSceneNode* m_cam;
+    irr::core::vector3df m_position[CAM_COUNT];
+    irr::scene::ISceneNode* m_frustum_node;
     irr::scene::IMeshSceneNode* m_near;
     irr::scene::IMeshSceneNode* m_far;
 };

@@ -35,7 +35,7 @@ enum CameraId { INSIDE_CAM, OUTSIDE_CAM, SIDE_CAM, TOP_CAM, CAM_COUNT };
 class Controller : public irr::IEventReceiver
 {
   public:
-    Controller() : m_device(0), m_bounds(true), m_axe(false), m_znear(2), m_zfar(10), m_near_center(0,0,m_znear)
+    Controller() : m_axe(false), m_bounds(true), m_znear(2), m_zfar(10), m_device(0), m_near_center(0,0,m_znear)
     {
         m_device = irr::createDevice(irr::video::EDT_NULL);
         const irr::s32 n = m_device->getVideoModeList()->getVideoModeCount();
@@ -211,6 +211,8 @@ class Controller : public irr::IEventReceiver
               case irr::KEY_ESCAPE: // Quit
                 m_device->closeDevice();
                 return true;
+              default:
+                return false;
             }
         }
         if (event.EventType == irr::EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown && !event.KeyInput.Shift) // Move cube
@@ -236,6 +238,8 @@ class Controller : public irr::IEventReceiver
               case irr::KEY_KEY_M:
                 m_cube->setPosition(m_cube->getPosition() - irr::core::vector3df(0,0,step));
                 return true;
+              default:
+                return false;
             }
         }
         if (event.EventType == irr::EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown && event.KeyInput.Shift) // Move near plane
@@ -255,6 +259,8 @@ class Controller : public irr::IEventReceiver
               case irr::KEY_RIGHT:
                 m_near_center -= irr::core::vector3df(step,0,0);
                 return true;
+              default:
+                return false;
             }
         }
         return false;
@@ -293,7 +299,6 @@ class Controller : public irr::IEventReceiver
     bool m_bounds;
     irr::f32 m_znear;
     irr::f32 m_zfar;
-    CameraId m_camid;
     irr::IrrlichtDevice* m_device;
     irr::video::IVideoDriver* m_driver;
     irr::scene::ISceneManager* m_smgr;

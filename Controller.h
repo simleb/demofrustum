@@ -20,18 +20,50 @@
 
 */
 
-#include "Controller.h"
+#ifndef CONTROLLER_H
+#define CONTROLLER_H
 
-#ifdef _IRR_WINDOWS_
-#pragma comment(lib, "Irrlicht.lib")
-#pragma comment(linker, "/subsystem:windows /ENTRY:mainCRTStartup")
-#endif
+#include <irrlicht.h>
 
 
-int main()
+enum CameraId { INSIDE_CAM, OUTSIDE_CAM, SIDE_CAM, TOP_CAM, CAM_COUNT };
+
+
+class Controller : public irr::IEventReceiver
 {
-    Controller controller;
+  public:
+    Controller();
+    void createScene();
 
-	return controller.run();
-}
+    int run();
+
+    void drawAxe();
+    void drawBounds();
+
+    void switchToCam(CameraId id);
+
+    virtual bool OnEvent(const irr::SEvent& event);
+
+    void setFrustum();
+
+  protected:
+    bool m_axe;
+    bool m_bounds;
+    irr::f32 m_znear;
+    irr::f32 m_zfar;
+    irr::IrrlichtDevice* m_device;
+    irr::video::IVideoDriver* m_driver;
+    irr::scene::ISceneManager* m_smgr;
+    irr::scene::ICameraSceneNode* m_inside_cam;
+    irr::scene::ICameraSceneNode* m_cam;
+    irr::core::vector3df m_position[CAM_COUNT];
+    irr::scene::ISceneNode* m_cube;
+    irr::scene::SViewFrustum m_frustum;
+    irr::scene::IMeshSceneNode* m_near;
+    irr::scene::IMeshSceneNode* m_far;
+    irr::core::vector3df m_near_center;
+    irr::core::dimension2df m_near_size;
+};
+
+#endif
 

@@ -32,6 +32,9 @@ file(GLOB Headers *.h)
 file(GLOB Sources *.cpp)
 add_executable(demofrustum ${Headers} ${Sources})
 
+# Enable all warnings
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
 if(APPLE)
     # Irrlicht needs some frameworks
     find_library(COCOA Cocoa)
@@ -40,7 +43,7 @@ if(APPLE)
     find_library(IOKIT IOKit)
     set(EXTRA_LIBS ${COCOA} ${OPENGL} ${CARBON} ${IOKIT})
     # Irrlicht also prefer sources to be compiled with visibility "hidden"
-    set_source_files_properties(${Sources} COMPILE_FLAGS -fvisibility=hidden)
+    set_source_files_properties(${Sources} COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
 endif(APPLE)
 
 # Enable warnings

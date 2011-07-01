@@ -52,7 +52,10 @@ void Controller::createScene()
 
     const irr::core::vector3df cube_position(0, 0, 0.5 * (m_zfar - m_znear));
     m_cube = m_smgr->addCubeSceneNode(1, 0, -1, cube_position, irr::core::vector3df(-36,28,0));
-    m_cube->setMaterialTexture(0, m_driver->getTexture("media/cube.jpg"));
+    irr::video::ITexture* texture = m_driver->getTexture("media/cube.jpg");
+    if (!texture) texture = m_driver->getTexture("../media/cube.jpg");
+    if (!texture) texture = m_driver->getTexture("../../media/cube.jpg");
+    m_cube->setMaterialTexture(0, texture);
     m_cube->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 
     setFrustum();

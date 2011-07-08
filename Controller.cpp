@@ -90,7 +90,11 @@ void Controller::makeScene()
     m_far = m_screen->clone();
     m_far->getMaterial(0).EmissiveColor.set(255, 255, 0, 0);
 
-    m_font = m_device->getGUIEnvironment()->getBuiltInFont();
+    irr::gui::IGUIEnvironment* gui = m_device->getGUIEnvironment();
+    m_font = gui->getFont("media/fontcourier.bmp");
+    if (!m_font) m_font = gui->getFont("../media/fontcourier.bmp");
+    if (!m_font) m_font = gui->getFont("../../media/fontcourier.bmp");
+    if (!m_font) m_font = gui->getBuiltInFont();
 }
 
 

@@ -108,7 +108,9 @@ void Controller::initScene()
     m_inside_cam->setPosition(irr::core::vector3df(0, 0, 0));
     m_inside_cam->setTarget(irr::core::vector3df(0, 0, m_zfar));
 
-    m_cam->setPosition(irr::core::vector3df(0, 0, 0));
+    m_cam->removeAnimators();
+    if (m_smgr->getActiveCamera() == m_inside_cam)
+        m_cam->setPosition(irr::core::vector3df(0, 0, 0));
     m_cam->setTarget(m_screen->getPosition());
 
     m_cube->setPosition(irr::core::vector3df(0, 0, 0.5 * (m_zfar - m_znear)));

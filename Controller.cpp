@@ -62,6 +62,8 @@ void Controller::makeDevice()
 
 void Controller::makeScene()
 {
+    m_smgr->setAmbientLight(irr::video::SColor(255, 224, 224, 224));
+
     m_inside_cam = m_smgr->addCameraSceneNode();
     m_cam = m_smgr->addCameraSceneNode();
 
@@ -71,7 +73,6 @@ void Controller::makeScene()
     if (!texture) texture = m_driver->getTexture("../media/cube.jpg");
     if (!texture) texture = m_driver->getTexture("../../media/cube.jpg");
     m_cube->setMaterialTexture(0, texture);
-    m_cube->setMaterialFlag(irr::video::EMF_LIGHTING, false);
 
     const irr::scene::IGeometryCreator* geo = m_smgr->getGeometryCreator();
     const irr::scene::IMeshManipulator* manip = m_smgr->getMeshManipulator();
@@ -80,15 +81,15 @@ void Controller::makeScene()
     manip->transform(mesh, irr::core::matrix4().buildRotateFromTo(irr::core::vector3df(0,1,0), irr::core::vector3df(0,0,1)));
     m_screen = m_smgr->addMeshSceneNode(mesh, 0, -1, irr::core::vector3df(0, 0, 0.5 * m_zfar));
     m_screen->setMaterialType(irr::video::EMT_TRANSPARENT_VERTEX_ALPHA);
-    m_screen->getMaterial(0).EmissiveColor.set(255, 255, 192, 0);
+    m_screen->getMaterial(0).AmbientColor.set(255, 128, 128, 0);
     m_screen->getMaterial(0).BackfaceCulling = false;
     m_screen->setVisible(false);
 
     m_near = m_screen->clone();
-    m_near->getMaterial(0).EmissiveColor.set(255, 0, 0, 255);
+    m_near->getMaterial(0).AmbientColor.set(255, 0, 0, 192);
 
     m_far = m_screen->clone();
-    m_far->getMaterial(0).EmissiveColor.set(255, 255, 0, 0);
+    m_far->getMaterial(0).AmbientColor.set(255, 192, 0, 0);
 
     irr::gui::IGUIEnvironment* gui = m_device->getGUIEnvironment();
     m_font = gui->getFont("media/fontcourier.bmp");
@@ -160,8 +161,7 @@ void Controller::drawScene()
 
     m_driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
 
-    irr::video::SMaterial mat; mat.setFlag(irr::video::EMF_LIGHTING, false);
-    m_driver->setMaterial(mat);
+    m_driver->setMaterial(irr::video::SMaterial());
 
     if (m_show[AXIS])
         m_driver->draw3DLine(m_inside_cam->getPosition(), m_inside_cam->getTarget());

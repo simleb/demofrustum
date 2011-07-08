@@ -224,7 +224,7 @@ void Controller::drawScene()
 
     if (m_show[HELP])
     {
-        const wchar_t help[] = L"Help:\n\n"
+        const irr::core::stringw help = L"Help:\n\n"
         L"C : Toggle cube\n"
         L"A : Toggle axis\n"
         L"B : Toggle bounds\n"
@@ -246,7 +246,7 @@ void Controller::drawScene()
         L"Shift + Arrows: Move cube parallel to screen plane\n"
         L"Shift + P: Move cube towards screen plane\n"
         L"Shift + M: Move cube away from screen plane";
-        const irr::core::dimension2du dim = m_font->getDimension(help);
+        const irr::core::dimension2du dim = m_font->getDimension(help.c_str());
         m_font->draw(help, irr::core::recti(20, 20, 20 + dim.Width, 20 + dim.Height), irr::video::SColor(255,255,255,255));
     }
 }

@@ -227,13 +227,15 @@ void Controller::drawScene()
     if (m_show[HELP])
     {
         const irr::core::stringw help = L"Help:\n\n"
+        L"H : Toggle help\n"
         L"C : Toggle cube\n"
         L"A : Toggle axis\n"
         L"B : Toggle bounds\n"
         L"N : Toggle near plane coloring\n"
         L"F : Toggle far plane coloring\n"
         L"S : Toggle screen plane coloring\n"
-        L"H : Toggle help\n\n\n"
+        L"R : Reset\n"
+        L"Esc : Quit\n\n\n"
         L"Views:\n\n"
         L"1 : Inside view\n"
         L"2 : Outside view\n"

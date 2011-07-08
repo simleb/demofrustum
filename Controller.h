@@ -28,7 +28,7 @@
 
 enum Mode { TARGET, FRUSTUM, MODE_COUNT };
 enum Camera { INSIDE, OUTSIDE, SIDE, TOP, CAM_COUNT };
-enum Element { CUBE, AXIS, BOUNDS, NEAR, FAR, SCREEN, OBJECT_COUNT };
+enum Element { CUBE, AXIS, BOUNDS, NEAR, FAR, SCREEN, HELP, OBJECT_COUNT };
 
 
 class Controller : public irr::IEventReceiver
@@ -68,6 +68,7 @@ class Controller : public irr::IEventReceiver
     irr::scene::ISceneNode* m_far;
     irr::scene::ISceneNode* m_screen;
     irr::core::dimension2df m_screen_size;
+    irr::gui::IGUIFont* m_font;
 };
 
 #endif

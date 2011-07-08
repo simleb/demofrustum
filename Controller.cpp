@@ -32,6 +32,7 @@ Controller::Controller() : m_mode(TARGET), m_znear(2), m_zfar(10)
     m_show[  NEAR] = false;
     m_show[   FAR] = false;
     m_show[SCREEN] = false;
+    m_show[  HELP] = true;
 
     makeDevice();
     makeScene();
@@ -88,6 +89,8 @@ void Controller::makeScene()
 
     m_far = m_screen->clone();
     m_far->getMaterial(0).EmissiveColor.set(255, 255, 0, 0);
+
+    m_font = m_device->getGUIEnvironment()->getBuiltInFont();
 }
 
 
@@ -214,6 +217,34 @@ void Controller::drawScene()
             m_far->setRotation(irr::core::vector3df(0));
         }
     }
+
+    if (m_show[HELP])
+    {
+        const wchar_t help[] = L"Help:\n\n"
+        L"C : Toggle cube\n"
+        L"A : Toggle axis\n"
+        L"B : Toggle bounds\n"
+        L"N : Toggle near plane coloring\n"
+        L"F : Toggle far plane coloring\n"
+        L"S : Toggle screen plane coloring\n"
+        L"H : Toggle help\n\n\n"
+        L"Views:\n\n"
+        L"1 : Inside view\n"
+        L"2 : Outside view\n"
+        L"3 : Side view\n"
+        L"4 : Top view\n\n\n"
+        L"Camera:\n\n"
+        L"Tab: Toggle mode\n"
+        L"Arrows: Move camera parallel to screen plane\n"
+        L"P: Move camera towards screen plane\n"
+        L"M: Move camera away from screen plane\n\n\n"
+        L"Cube:\n\n"
+        L"Shift + Arrows: Move cube parallel to screen plane\n"
+        L"Shift + P: Move cube towards screen plane\n"
+        L"Shift + M: Move cube away from screen plane";
+        const irr::core::dimension2du dim = m_font->getDimension(help);
+        m_font->draw(help, irr::core::recti(20, 20, 20 + dim.Width, 20 + dim.Height), irr::video::SColor(255,255,255,255));
+    }
 }
 
 
@@ -266,6 +297,9 @@ bool Controller::OnEvent(const irr::SEvent& event)
           case irr::KEY_KEY_S: // Toggle screen plan coloring
             m_show[SCREEN] = !m_show[SCREEN];
             m_screen->setVisible(m_show[SCREEN]);
+            return true;
+          case irr::KEY_KEY_H:
+            m_show[HELP] = !m_show[HELP];
             return true;
           case irr::KEY_KEY_R: // Reset position
             initScene();

@@ -390,8 +390,16 @@ void Controller::updateFrustum()
 
     if (m_mode == TARGET)
     {
-        proj.buildProjectionMatrixPerspectiveLH(q * m_screen_size.Width, q * m_screen_size.Height, m_znear, m_zfar);
-        m_inside_cam->setProjectionMatrix(proj);
+        const irr::f32 width = q * m_screen_size.Width;
+        const irr::f32 height = q * m_screen_size.Height;
+
+        proj[0] = (2.0 * m_znear) / width;
+        proj[5] = (2.0 * m_znear) / height;
+        proj[10] = (m_zfar + m_znear) / (m_zfar - m_znear);
+        proj[11] = 1.0;
+        proj[14] = -(2.0 * m_zfar * m_znear) / (m_zfar - m_znear);
+        proj[15] = 0.0;
+
         m_inside_cam->setTarget(screen);
     }
     if (m_mode == FRUSTUM)
@@ -409,8 +417,9 @@ void Controller::updateFrustum()
         proj[11] = 1.0;
         proj[14] = -(2.0 * m_zfar * m_znear) / (m_zfar - m_znear);
         proj[15] = 0.0;
-        m_inside_cam->setProjectionMatrix(proj);
+
         m_inside_cam->setTarget(cam + irr::core::vector3df(0, 0, m_zfar));
     }
+    m_inside_cam->setProjectionMatrix(proj);
 }
 

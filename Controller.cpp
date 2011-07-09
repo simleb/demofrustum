@@ -313,19 +313,19 @@ bool Controller::OnEvent(const irr::SEvent& event)
           case irr::KEY_KEY_B: // Toggle bounds
             m_show[BOUNDS] = !m_show[BOUNDS];
             return true;
-          case irr::KEY_KEY_N: // Toggle near plan coloring
+          case irr::KEY_KEY_N: // Toggle near plane coloring
             m_show[NEAR] = !m_show[NEAR];
             m_near->setVisible(m_show[NEAR]);
             return true;
-          case irr::KEY_KEY_F: // Toggle far plan coloring
+          case irr::KEY_KEY_F: // Toggle far plane coloring
             m_show[FAR] = !m_show[FAR];
             m_far->setVisible(m_show[FAR]);
             return true;
-          case irr::KEY_KEY_S: // Toggle screen plan coloring
+          case irr::KEY_KEY_S: // Toggle screen plane coloring
             m_show[SCREEN] = !m_show[SCREEN];
             m_screen->setVisible(m_show[SCREEN]);
             return true;
-          case irr::KEY_KEY_H:
+          case irr::KEY_KEY_H: // Toggle help
             m_show[HELP] = !m_show[HELP];
             return true;
           case irr::KEY_KEY_R: // Reset position

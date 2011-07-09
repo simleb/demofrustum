@@ -9,14 +9,27 @@ it was to draw a correct-looking frustum…
 Build and Run
 -------------
 
-The build system is using Cmake. To build and run:
+The build system is using Cmake.
+
+To build:
 
     > mkdir build && cd build
     > cmake ..
     > make
-    > ./demofrustum
 
 Feel free to try other CMake generators as well...
+
+To run:
+
+* On linux:
+
+        > ./demofrustum
+
+* On OS X:
+
+        > open Demo\ Frustum.app
+
+    or simply double-click on the _Demo Frustum_ application.
 
 
 Credits

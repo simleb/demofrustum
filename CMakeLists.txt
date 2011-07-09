@@ -27,10 +27,10 @@ project(DemoFrustum CXX)
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR})
 find_package(Irrlicht REQUIRED)
 
-# Executable from headers and sources
+# Headers, sources and resources
 file(GLOB Headers *.h)
 file(GLOB Sources *.cpp)
-add_executable(demofrustum ${Headers} ${Sources})
+file(GLOB Resources media/*)
 
 # Enable all warnings
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
@@ -44,10 +44,22 @@ if(APPLE)
     set(EXTRA_LIBS ${COCOA} ${OPENGL} ${CARBON} ${IOKIT})
     # Irrlicht also prefer sources to be compiled with visibility "hidden"
     set_source_files_properties(${Sources} COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+    # Make a proper app bundle
+    set_source_files_properties(${Resources} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+    set(MACOSX_BUNDLE_ICON_FILE cube)
+    set(MACOSX_BUNDLE_GUI_IDENTIFIER "edu.princeton.\${PRODUCT_NAME:identifier}")
+    set(MACOSX_BUNDLE_BUNDLE_NAME "Demo Frustum")
+    set(MACOSX_BUNDLE_SHORT_VERSION_STRING "0.2")
+    set(MACOSX_BUNDLE_COPYRIGHT "2011 Simon Leblanc, Couzin Lab @ Princeton University")
+    set(TARGET_NAME "Demo Frustum")
+    set(TARGET_TYPE "MACOSX_BUNDLE")
 endif(APPLE)
+
+# Executable from headers, sources and resources
+add_executable(${TARGET_NAME} ${TARGET_TYPE} ${Headers} ${Sources} ${Resources})
 
 # Include directory
 include_directories(${PROJECT_SOURCE_DIR} ${IRRLICHT_INCLUDE_DIR})
 
 # Linking libraries
-target_link_libraries(demofrustum ${IRRLICHT_LIBRARIES} ${EXTRA_LIBS})
+target_link_libraries(${TARGET_NAME} ${IRRLICHT_LIBRARIES} ${EXTRA_LIBS})

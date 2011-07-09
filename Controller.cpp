@@ -23,6 +23,10 @@
 
 #include "Controller.h"
 
+#ifdef _IRR_OSX_PLATFORM_
+#include "CoreFoundation/CoreFoundation.h"
+#endif
+
 
 Controller::Controller() : m_mode(TARGET), m_znear(2), m_zfar(10)
 {
@@ -69,7 +73,17 @@ void Controller::makeScene()
 
     const irr::core::vector3df cube_position(0, 0, 0.5 * (m_zfar - m_znear));
     m_cube = m_smgr->addCubeSceneNode(1, 0, -1, cube_position, irr::core::vector3df(-36,28,0));
-    irr::video::ITexture* texture = m_driver->getTexture("media/cube.jpg");
+#ifdef _IRR_OSX_PLATFORM_
+    CFURLRef resourcesURL = CFBundleCopyResourcesDirectoryURL(CFBundleGetMainBundle());
+    char path[PATH_MAX];
+    CFURLGetFileSystemRepresentation(resourcesURL, TRUE, (UInt8*)path, PATH_MAX);
+    CFRelease(resourcesURL);
+    const irr::core::stringc resources(path);
+    irr::video::ITexture* texture = m_driver->getTexture(resources + "/cube.jpg");
+#else
+    irr::video::ITexture* texture = m_driver->getTexture("cube.jpg");
+#endif
+    if (!texture) texture = m_driver->getTexture("media/cube.jpg");
     if (!texture) texture = m_driver->getTexture("../media/cube.jpg");
     if (!texture) texture = m_driver->getTexture("../../media/cube.jpg");
     m_cube->setMaterialTexture(0, texture);
@@ -92,7 +106,12 @@ void Controller::makeScene()
     m_far->getMaterial(0).AmbientColor.set(255, 192, 0, 0);
 
     irr::gui::IGUIEnvironment* gui = m_device->getGUIEnvironment();
-    m_font = gui->getFont("media/fontcourier.bmp");
+#ifdef _IRR_OSX_PLATFORM_
+    m_font = gui->getFont(resources + "/fontcourier.bmp");
+#else
+    m_font = gui->getFont("fontcourier.bmp");
+#endif
+    if (!m_font) m_font = gui->getFont("media/fontcourier.bmp");
     if (!m_font) m_font = gui->getFont("../media/fontcourier.bmp");
     if (!m_font) m_font = gui->getFont("../../media/fontcourier.bmp");
     if (!m_font) m_font = gui->getBuiltInFont();

@@ -245,30 +245,41 @@ void Controller::drawScene()
 
     if (m_show[HELP])
     {
-        const irr::core::stringw help = L"Help:\n\n"
-        L"H : Toggle help\n"
-        L"C : Toggle cube\n"
-        L"A : Toggle axis\n"
-        L"B : Toggle bounds\n"
-        L"N : Toggle near plane coloring\n"
-        L"F : Toggle far plane coloring\n"
-        L"S : Toggle screen plane coloring\n"
-        L"R : Reset\n"
-        L"Esc : Quit\n\n\n"
-        L"Views:\n\n"
-        L"1 : Inside view\n"
-        L"2 : Outside view\n"
-        L"3 : Side view\n"
-        L"4 : Top view\n\n\n"
-        L"Camera:\n\n"
-        L"Tab: Toggle mode\n"
-        L"Arrows: Move camera parallel to screen plane\n"
-        L"P: Move camera towards screen plane\n"
-        L"M: Move camera away from screen plane\n\n\n"
-        L"Cube:\n\n"
-        L"Shift + Arrows: Move cube parallel to screen plane\n"
-        L"Shift + P: Move cube towards screen plane\n"
-        L"Shift + M: Move cube away from screen plane";
+        irr::core::stringw help = "Help:\n\n";
+        help += "H : Toggle help\n";
+        help += "C : Toggle cube (";
+        help += (m_show[CUBE] ? "On)\n" : "Off)\n");
+        help += "A : Toggle axis (";
+        help += (m_show[AXIS] ? "On)\n" : "Off)\n");
+        help += "B : Toggle bounds (";
+        help += (m_show[BOUNDS] ? "On)\n" : "Off)\n");
+        help += "N : Toggle near plane coloring (";
+        help += (m_show[NEAR] ? "On)\n" : "Off)\n");
+        help += "F : Toggle far plane coloring (";
+        help += (m_show[FAR] ? "On)\n" : "Off)\n");
+        help += "S : Toggle screen plane coloring (";
+        help += (m_show[SCREEN] ? "On)\n" : "Off)\n");
+        help += "R : Reset\n";
+        help += "Esc : Quit\n\n\n";
+        help += "Views:\n\n";
+        help += "1 : Inside view";
+        help += (m_smgr->getActiveCamera() == m_inside_cam ? " (Current)\n" : "\n");
+        help += "2 : Outside view";
+        help += (m_cam->getPosition() == m_position[OUTSIDE] ? " (Current)\n" : "\n");
+        help += "3 : Side view";
+        help += (m_cam->getPosition() == m_position[SIDE] ? " (Current)\n" : "\n");
+        help += "4 : Top view";
+        help += (m_cam->getPosition() == m_position[TOP] ? " (Current)\n\n\n" : "\n\n\n");
+        help += "Camera:\n\n";
+        help += "Tab: Toggle mode";
+        help += (m_mode == TARGET ? " (Target)\n" : " (Frustum)\n");
+        help += "Arrows: Move camera parallel to screen plane\n";
+        help += "P: Move camera towards screen plane\n";
+        help += "M: Move camera away from screen plane\n\n\n";
+        help += "Cube:\n\n";
+        help += "Shift + Arrows: Move cube parallel to screen plane\n";
+        help += "Shift + P: Move cube towards screen plane\n";
+        help += "Shift + M: Move cube away from screen plane";
         const irr::core::dimension2du dim = m_font->getDimension(help.c_str());
         m_font->draw(help, irr::core::recti(20, 20, 20 + dim.Width, 20 + dim.Height), irr::video::SColor(255,255,255,255));
     }

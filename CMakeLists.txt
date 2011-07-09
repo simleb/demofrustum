@@ -46,9 +46,6 @@ if(APPLE)
     set_source_files_properties(${Sources} COMPILE_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
 endif(APPLE)
 
-# Enable warnings
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
-
 # Include directory
 include_directories(${PROJECT_SOURCE_DIR} ${IRRLICHT_INCLUDE_DIR})
 

@@ -125,7 +125,7 @@ void Controller::initScene()
     m_position[SIDE] = irr::core::vector3df(-1, 0, 0.5) * m_zfar;
 
     m_inside_cam->setPosition(irr::core::vector3df(0, 0, 0));
-    m_inside_cam->setTarget(irr::core::vector3df(0, 0, m_zfar));
+    m_inside_cam->setTarget(m_screen->getPosition());
 
     m_cam->removeAnimators();
     if (m_smgr->getActiveCamera() == m_inside_cam)

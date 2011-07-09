@@ -184,10 +184,10 @@ void Controller::drawScene()
 
     m_driver->setMaterial(irr::video::SMaterial());
 
-    if (m_show[AXIS])
+    if (m_show[AXIS] && m_smgr->getActiveCamera() != m_inside_cam)
         m_driver->draw3DLine(m_inside_cam->getPosition(), m_inside_cam->getTarget());
 
-    if (m_show[BOUNDS])
+    if (m_show[BOUNDS] && m_smgr->getActiveCamera() != m_inside_cam)
     {
         m_driver->draw3DLine(cam, fld);
         m_driver->draw3DLine(cam, flu);
